@@ -1,0 +1,21 @@
+services:
+  clickhouse-server:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-server
+    environment:
+      - CLICKHOUSE_DB=my_databse  # Optional: Define a default database
+      - CLICKHOUSE_USER=admin    # Optional: Define a custom user
+      - CLICKHOUSE_PASSWORD=admin  # Optional: Define the password for the custom user
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ./data:/var/lib/clickhouse
+      - ./logs:/var/log/clickhouse-server
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "9000:9000"  # ClickHouse native client port
+      - "8123:8123"  # HTTP interface port
+volumes:
+  clickhouse_data:
