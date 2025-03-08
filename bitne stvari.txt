@@ -1,0 +1,19 @@
+﻿
+-- NE TREVA OVO, OVO SAMO NA POCETKU, kreiranje docker 
+docker run -d  --name clickhouse-server -p 8123:8123 -p 9000:9000 clickhouse/clickhouse-server
+
+--pokretanej dokcer clickhouse
+ docker compose up -d
+
+--- ulazak u clickhouse db :>
+docker exec -it clickhouse-server clickhouse-client --port 9000 --user admin --password admin
+
+--ubacivanje iz json u model : 
+>type D:\MOCK_DATA.json | docker exec -i clickhouse-server clickhouse-client --query="INSERT INTO my_database.customers FORMAT JSONEachRow" --port 9000 --user admin --password admin
+
+-- u MOCK_DATA.JSON nije pravi json vec je svaki red jedan json obeakt i datetime format je vbez navodnika 
+
+--select se radi, udej se u clcikhouse preko console, pa se razi SELECT * FROM my_database.<tabela>
+
+--primer join-a dve tabele
+select * from my_database.products left join my_database.orders ON  my_database.products.productId = my_database.orders.productId where orders.productId = ''^C
