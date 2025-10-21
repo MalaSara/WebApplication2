@@ -359,4 +359,7 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /WebApplication2/data
+<<<<<<< HEAD
 /WebApplication2/.clickhouse/
+=======
+>>>>>>> d8755cb6b101e3725d3ccc7528080c79e3058c94

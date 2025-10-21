@@ -1,10 +1,7 @@
 ﻿using ClickHouse.Client.ADO;
 using Microsoft.AspNetCore.Http.HttpResults;
-<<<<<<< HEAD
 using Microsoft.Extensions.Options;
 using WebApplication2.Options;
-=======
->>>>>>> d8755cb6b101e3725d3ccc7528080c79e3058c94
 
 namespace WebApplication2.Services
 {
@@ -16,7 +13,6 @@ namespace WebApplication2.Services
     public class ClickHouseService : IClickHouseService
     {
 
-<<<<<<< HEAD
         private readonly ClickHouseOptions _clickHouseOptions;
 
         public ClickHouseService(IOptions<ClickHouseOptions> clickHouseOptions)
@@ -25,37 +21,27 @@ namespace WebApplication2.Services
             CreateTablesIfNotExist();
         }
 
-=======
->>>>>>> d8755cb6b101e3725d3ccc7528080c79e3058c94
+
         public void TestConnection()
         {
             try
             {
-<<<<<<< HEAD
+
                 using (var connection = new ClickHouseConnection(_clickHouseOptions.ConnectionString))
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandText = "SHOW TABLES FROM my_database";
-=======
-                string connectionString = "Host=localhost;Port=8123;Database=my_databse;Username=admin;Password=admin";
-                using (var connection = new ClickHouseConnection(connectionString))
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText = "SELECT * FROM system.tables LIMIT 10";
->>>>>>> d8755cb6b101e3725d3ccc7528080c79e3058c94
+
+                //string connectionString = "Host=localhost;Port=8123;Database=my_databse;Username=admin;Password=admin";
 
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-<<<<<<< HEAD
-                            Console.WriteLine(reader[0]);  
-=======
-                            Console.WriteLine(reader[0]);  // Display the first column
->>>>>>> d8755cb6b101e3725d3ccc7528080c79e3058c94
+                            Console.WriteLine(reader[0]);
                         }
+                        
                     }
                 }
             }
@@ -66,7 +52,6 @@ namespace WebApplication2.Services
             }
         }
 
-<<<<<<< HEAD
 
         public void CreateTablesIfNotExist()
         {
@@ -124,9 +109,6 @@ namespace WebApplication2.Services
             }
 
         }
-
-=======
->>>>>>> d8755cb6b101e3725d3ccc7528080c79e3058c94
       
     }
 }
