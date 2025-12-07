@@ -13,7 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
 builder.Services.Configure<ClickHouseOptions>(builder.Configuration.GetSection(ClickHouseOptions.ClickHouseSettings));
-builder.Services.AddSingleton<IClickHouseService, ClickHouseService>();
+builder.Services.AddScoped<IClickHouseService, ClickHouseService>();
 
 
 var app = builder.Build();
