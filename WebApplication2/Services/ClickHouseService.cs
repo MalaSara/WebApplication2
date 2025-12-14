@@ -37,6 +37,7 @@ namespace WebApplication2.Services
 
         Task<List<Dictionary<string, object>>> SalesPerMonth();
 
+        Task<List<Dictionary<string, object>>> Top20CustomerPerAverageSales();
         Task<List<Dictionary<string, object>>> TopSaleProductPerMonth();
 
     }
@@ -123,7 +124,7 @@ namespace WebApplication2.Services
                     command = connection.CreateCommand();
                     command.CommandText = "create table if not exists my_database.products" +
                         "(productId String," +
-                        "name String," +
+                        "description String," +
                         "category String," +
                         "price double" +
                         ") engine = MergeTree" +
@@ -182,14 +183,14 @@ namespace WebApplication2.Services
         public async Task InsertProduct(Product p)
         {
             string sql = @"
-            INSERT INTO my_database.products (productId, name, category, price)
-            VALUES (@productId, @name, @category, @price";
+            INSERT INTO my_database.products (productId, description, category, price)
+            VALUES (@productId, @description, @category, @price";
 
             using var cmd = _clickHouseConnection.CreateCommand();
             cmd.CommandText = sql;
 
             cmd.AddParameter("productId", p.productId);
-            cmd.AddParameter("name", p.name);
+            cmd.AddParameter("description", p.description);
             cmd.AddParameter("category", p.category);
             cmd.AddParameter("price", p.price);
 
@@ -274,13 +275,13 @@ namespace WebApplication2.Services
             cmd.CommandText = @"
             SELECT
                 p.productId,
-                p.name,
+                p.description,
                 p.category,
                 SUM(o.quanity) AS total_sold_units,
                 SUM(o.quanity * p.price) AS total_revenue
             FROM my_database.products AS p
             LEFT JOIN my_database.orders AS o ON o.productId = p.productId
-            GROUP BY p.productId, p.name, p.category
+            GROUP BY p.productId, p.description, p.category
             ORDER BY total_revenue DESC
             LIMIT 10
             ";
@@ -368,12 +369,12 @@ namespace WebApplication2.Services
                 c.customerId,
                 c.name,
                 p.productId,
-                p.name AS product_name,
+                p.description AS product_description,
                 SUM(o.quanity) AS total_quanity
             FROM my_database.customers AS c
             LEFT JOIN my_database.orders AS o ON o.customerId = c.customerId
             LEFT JOIN my_database.products AS p ON p.productId = o.productId
-            GROUP BY c.customerId, c.name, p.productId, p.name
+            GROUP BY c.customerId, c.name, p.productId, p.description
             ORDER BY c.customerId, total_quanity DESC
             ";
 
@@ -410,7 +411,7 @@ namespace WebApplication2.Services
 
             foreach (DataRow dr in dt.Rows)
             {
-                var dict = new Dictionary<string, object>();
+                var dict = new Dictionary<string, object>(); 
                 foreach (DataColumn col in dt.Columns)
                 {
                     dict[col.ColumnName] = dr[col];
