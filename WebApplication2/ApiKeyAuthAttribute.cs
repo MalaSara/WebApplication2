@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace WebApplication2;
 
-public class Authorization : Attribute, IAsyncActionFilter
+public class ApiKeyAuthAttribute: Attribute, IAsyncActionFilter
 {
     private const string ApiKeyHeaderName = "X-API-KEY";
 
