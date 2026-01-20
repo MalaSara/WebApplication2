@@ -3,7 +3,7 @@ services:
     image: clickhouse/clickhouse-server:latest
     container_name: clickhouse-server
     environment:
-      - CLICKHOUSE_DB=my_database  # Optional: Define a default database
+      - CLICKHOUSE_DB=appdb  # Optional: Define a  database
       - CLICKHOUSE_USER=admin    # Optional: Define a custom user
       - CLICKHOUSE_PASSWORD=admin  # Optional: Define the password for the custom user
     ulimits:
@@ -16,6 +16,36 @@ services:
     ports:
       - "9000:9000"  # ClickHouse native client port
       - "8123:8123"  # HTTP interface port
+      
+      
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    command: --local-infile=1
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  grafana:
+     image: grafana/grafana:latest
+     container_name: grafana
+     ports:
+     - "3000:3000"
+     environment:
+          - GF_SECURITY_ADMIN_USER=admin
+          - GF_SECURITY_ADMIN_PASSWORD=admin
+     volumes:
+      - grafana-storage:/var/lib/grafana
+
 volumes:
   clickhouse_data:
+  mysql_data:
+  grafana-storage:
+
 

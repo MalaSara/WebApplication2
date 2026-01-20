@@ -8,6 +8,8 @@ docker run -d  --name clickhouse-server -p 8123:8123 -p 9000:9000 clickhouse/cli
 --- ulazak u clickhouse db :>
 docker exec -it clickhouse-server clickhouse-client --port 9000 --user admin --password admin
 
+docker exec -it mysql mysql -uadmin -padmin app_db
+
 --ubacivanje iz json u model : 
 >type D:\MOCK_DATA.json | docker exec -i clickhouse-server clickhouse-client --query="INSERT INTO my_database.customers FORMAT JSONEachRow" --port 9000 --user admin --password admin
 
@@ -17,3 +19,7 @@ docker exec -it clickhouse-server clickhouse-client --port 9000 --user admin --p
 
 --primer join-a dve tabele
 select * from my_database.products left join my_database.orders ON  my_database.products.productId = my_database.orders.productId where orders.productId = ''^C
+
+
+
+docker cp D:\MOCK_DATA.json mysql:/var/lib/mysql-files/customers_data.json

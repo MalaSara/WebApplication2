@@ -99,7 +99,7 @@ namespace WebApplication2.Services
                     }
 
                     var command = connection.CreateCommand();
-                    command.CommandText = "create table if not exists my_database.customers " +
+                    command.CommandText = "create table if not exists appdb.mysql_customers " +
                         "(customerId int," +
                         "name String," +
                         "registrationDate DateTime" +
@@ -110,19 +110,19 @@ namespace WebApplication2.Services
 
 
                     command = connection.CreateCommand();
-                    command.CommandText = "create table if not exists my_database.orders" +
+                    command.CommandText = "create table if not exists appdb.mysql_orders" +
                         "(orderId int," +
                         "customerId int," +
                         "productId String," +
                         "orderDate DateTime," +
-                        "quanity int" +
+                        "quantity int" +
                         ") engine = MergeTree" +
                         " primary key orderId";
 
                     reader = command.ExecuteReader();
 
                     command = connection.CreateCommand();
-                    command.CommandText = "create table if not exists my_database.products" +
+                    command.CommandText = "create table if not exists appdb.mysql_products" +
                         "(productId String," +
                         "description String," +
                         "category String," +
@@ -148,7 +148,7 @@ namespace WebApplication2.Services
         public async Task InsertCustomer(Customer c)
         {
             string sql = @"
-            INSERT INTO my_database.customers (customerid, name, registartionDate)
+            INSERT INTO appdb.mysql_customers (customerid, name, registartionDate)
             VALUES (@id, @name, @email)
             ";
 
@@ -165,8 +165,8 @@ namespace WebApplication2.Services
         public async Task InsertOrder(Order o)
         {
             string sql = @"
-            INSERT INTO my_database.orders (orderId, customerId, productId, orderDate, quanity)
-            VALUES (@orderId, @customerId, @productId, @orderDate, @quanity)";
+            INSERT INTO appdb.mysql_orders (orderId, customerId, productId, orderDate, quantity)
+            VALUES (@orderId, @customerId, @productId, @orderDate, @quantity)";
 
             using var cmd = _clickHouseConnection.CreateCommand();
             cmd.CommandText = sql;
@@ -175,7 +175,7 @@ namespace WebApplication2.Services
             cmd.AddParameter("customerId", o.customerId);
             cmd.AddParameter("productId", o.productId);
             cmd.AddParameter("orderDate", o.orderDate);
-            cmd.AddParameter("quanity", o.quanity);
+            cmd.AddParameter("quantity", o.quantity);
 
             await cmd.ExecuteNonQueryAsync();
         }
@@ -183,7 +183,7 @@ namespace WebApplication2.Services
         public async Task InsertProduct(Product p)
         {
             string sql = @"
-            INSERT INTO my_database.products (productId, description, category, price)
+            INSERT INTO appdb.mysql_products (productId, description, category, price)
             VALUES (@productId, @description, @category, @price";
 
             using var cmd = _clickHouseConnection.CreateCommand();
@@ -207,7 +207,7 @@ namespace WebApplication2.Services
             using var connection = new ClickHouseConnection(_clickHouseOptions.ConnectionString);
             using var cmd = connection.CreateCommand();
 
-            cmd.CommandText = "SELECT * FROM my_database.customers ORDER BY customerId";
+            cmd.CommandText = "SELECT * FROM appdb.mysql_customers ORDER BY customerId";
 
             using var reader = await cmd.ExecuteReaderAsync();
 
@@ -220,7 +220,7 @@ namespace WebApplication2.Services
         {
             using var connection = new ClickHouseConnection(_clickHouseOptions.ConnectionString);
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM my_database.orders ORDER BY orderId";
+            cmd.CommandText = "SELECT * FROM appdb.mysql_orders ORDER BY orderId";
 
             using var reader = await cmd.ExecuteReaderAsync();
 
@@ -232,7 +232,7 @@ namespace WebApplication2.Services
         {
             using var connection = new ClickHouseConnection(_clickHouseOptions.ConnectionString);
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM my_database.products ORDER BY productId";
+            cmd.CommandText = "SELECT * FROM appdb.mysql_products ORDER BY productId";
 
             using var reader = await cmd.ExecuteReaderAsync();
 
@@ -254,9 +254,9 @@ namespace WebApplication2.Services
                 SUM(p.price) AS total_spent,
                 COUNT(*) AS order_count,
                 AVG(p.price) AS avg_order_value
-                FROM my_database.products AS p
-                LEFT JOIN my_database.orders AS o ON o.productId = p.productId
-                LEFT JOIN my_database.customers AS c ON c.customerId = o.customerId
+                FROM appdb.mysql_products AS p
+                LEFT JOIN appdb.mysql_orders AS o ON o.productId = p.productId
+                LEFT JOIN appdb.mysql_customers AS c ON c.customerId = o.customerId
                 GROUP BY c.customerId
                 ORDER BY total_spent DESC
                 ";
@@ -277,10 +277,10 @@ namespace WebApplication2.Services
                 p.productId,
                 p.description,
                 p.category,
-                SUM(o.quanity) AS total_sold_units,
-                SUM(o.quanity * p.price) AS total_revenue
-            FROM my_database.products AS p
-            LEFT JOIN my_database.orders AS o ON o.productId = p.productId
+                SUM(o.quantity) AS total_sold_units,
+                SUM(o.quantity * p.price) AS total_revenue
+            FROM appdb.mysql_products AS p
+            LEFT JOIN appdb.mysql_orders AS o ON o.productId = p.productId
             GROUP BY p.productId, p.description, p.category
             ORDER BY total_revenue DESC
             LIMIT 10
@@ -299,10 +299,10 @@ namespace WebApplication2.Services
             cmd.CommandText = @"
             SELECT
                 toDate(o.orderDate) AS day,
-                SUM(o.quanity * p.price) AS daily_revenue,
+                SUM(o.quantity * p.price) AS daily_revenue,
                 COUNT(DISTINCT o.orderId) AS orders_count
-            FROM my_database.orders AS o
-            LEFT JOIN my_database.products AS p ON p.productId = o.productId
+            FROM appdb.mysql_orders AS o
+            LEFT JOIN appdb.mysql_products AS p ON p.productId = o.productId
             GROUP BY day
             ORDER BY day
             ";
@@ -320,11 +320,11 @@ namespace WebApplication2.Services
 
             cmd.CommandText = @"
             SELECT
-            toStartOfMonth(o.orderDate) AS month,
-            SUM(o.quanity * p.price) AS monthly_revenue,
-            COUNT(DISTINCT o.orderId) AS monthly_orders
-            FROM my_database.orders AS o
-            LEFT JOIN my_database.products AS p ON p.productId = o.productId
+                toStartOfMonth(o.orderDate) AS month,
+                SUM(o.quantity * p.price) AS monthly_revenue,
+                COUNT(DISTINCT o.orderId) AS monthly_orders
+            FROM appdb.mysql_orders AS o
+            LEFT JOIN appdb.mysql_products AS p ON p.productId = o.productId
             GROUP BY month
             ORDER BY month
             ";
@@ -344,10 +344,10 @@ namespace WebApplication2.Services
             SELECT
                 c.customerId,
                 c.name,
-                AVG(p.price * o.quanity) AS avg_order_value
-            FROM my_database.customers AS c
-            LEFT JOIN my_database.orders AS o ON o.customerId = c.customerId
-            LEFT JOIN my_database.products AS p ON p.productId = o.productId
+                AVG(p.price * o.quantity) AS avg_order_value
+            FROM appdb.mysql_customers AS c
+            LEFT JOIN appdb.mysql_orders AS o ON o.customerId = c.customerId
+            LEFT JOIN appdb.mysql_products AS p ON p.productId = o.productId
             GROUP BY c.customerId, c.name
             ORDER BY avg_order_value DESC
             LIMIT 20
@@ -370,12 +370,12 @@ namespace WebApplication2.Services
                 c.name,
                 p.productId,
                 p.description AS product_description,
-                SUM(o.quanity) AS total_quanity
-            FROM my_database.customers AS c
-            LEFT JOIN my_database.orders AS o ON o.customerId = c.customerId
-            LEFT JOIN my_database.products AS p ON p.productId = o.productId
+                SUM(o.quantity) AS total_quantity
+            FROM appdb.mysql_customers AS c
+            LEFT JOIN appdb.mysql_orders AS o ON o.customerId = c.customerId
+            LEFT JOIN appdb.mysql_products AS p ON p.productId = o.productId
             GROUP BY c.customerId, c.name, p.productId, p.description
-            ORDER BY c.customerId, total_quanity DESC
+            ORDER BY c.customerId, total_quantity DESC
             ";
 
             using var reader = await cmd.ExecuteReaderAsync();

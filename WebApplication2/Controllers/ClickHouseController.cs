@@ -23,7 +23,7 @@ public class ClickHouseController : Controller
             _clickHouseService.TestConnection();
     }
 
-    [HttpGet]
+    [HttpPost]
     [ApiKeyAuth]
     public async Task<IActionResult> InsertCustomer(Customer c)
     {
@@ -41,7 +41,7 @@ public class ClickHouseController : Controller
         }
     }
     
-    [HttpGet]
+    [HttpPost]
     [ApiKeyAuth]
     public async Task<IActionResult> InsertOrder(Order o)
     {
@@ -59,7 +59,7 @@ public class ClickHouseController : Controller
         }
     }
 
-    [HttpGet]
+    [HttpPost]
     [ApiKeyAuth]
     public async Task<IActionResult> InsertProduct(Product p)
     {
@@ -85,7 +85,7 @@ public class ClickHouseController : Controller
         {
 
             var rows = await _clickHouseService.GetAllCustomerslAsync();
-            return Ok(rows); // returns
+            return Ok(rows);
         }
         catch (Exception e)
         {
@@ -129,7 +129,7 @@ public class ClickHouseController : Controller
     }
 
     [HttpGet]
-    [ApiKeyAuth]
+    //[ApiKeyAuth]
     public async Task<IActionResult> TotalSalesPerCustomer()
     {
         try
@@ -154,7 +154,7 @@ public class ClickHouseController : Controller
 
             var rows = await _clickHouseService.Top10MostProfitableProducts();
             return Ok(rows); 
-        }
+        } 
         catch (Exception e)
         {
             throw new Exception(e.Message);

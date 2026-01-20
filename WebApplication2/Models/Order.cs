@@ -17,6 +17,6 @@ namespace WebApplication2.Models
         public DateTime orderDate { get; set; }
 
         [Required]
-        public int quanity { get; set; }
+        public int quantity { get; set; }
     }
 }
