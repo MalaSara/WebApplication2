@@ -2,11 +2,11 @@
 -- NE TREVA OVO, OVO SAMO NA POCETKU, kreiranje docker 
 docker run -d  --name clickhouse-server -p 8123:8123 -p 9000:9000 clickhouse/clickhouse-server
 
---pokretanej dokcer clickhouse
+--pokretanej dokcer 
  docker compose up -d
 
 --- ulazak u clickhouse db :>
-docker exec -it clickhouse-server clickhouse-client --port 9000 --user admin --password admin
+docker exec -it clickhouse-server clickhouse-client --user admin --password admin
 
 docker exec -it mysql mysql -uadmin -padmin app_db
 
